@@ -15,7 +15,10 @@ int main() {
 
 	SetTargetFPS(60);
 
+	Font font = LoadFont("resources/Rubik-ExtraBold.ttf");
+
 	GameScene mainScene(screenWidth, screenHeight, cols, rows, GameMode::VsPlayer);
+	mainScene.SetFont(font);
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
@@ -28,6 +31,8 @@ int main() {
 	}
 
 	CloseWindow();
+
+	UnloadFont(font);
 
 	return 0;
 }

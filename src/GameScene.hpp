@@ -19,6 +19,7 @@ private:
 
 	GameMode currentGameMode;
 	Slot slots[ROWS][COLS];
+	Font font;
 
 	Connect4Logic connect4Logic;
 
@@ -49,6 +50,10 @@ public:
 		delete players[1];
 	}
 
+	void SetFont(Font font) {
+		this->font = font;
+	}
+
 	Vector2 GetClickedSlotIndex() {
 		Vector2 mousePos = GetMousePosition();
 
@@ -76,6 +81,11 @@ public:
 		DrawRectangle(0, 0, screenWidth, 50, BLUE);
 
 		DrawRectangle(0, fromTopOffset, screenWidth, screenHeight, BLUE);
+
+		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
+		Player* curPlayer = players[isPlayer1Turn];
+
+		DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", {10, 10}, 25, 0, curPlayer->GetColor());
 
 		for (int i = 0; i < ROWS; ++i) {
 			for (int j = 0; j < COLS; ++j) {
