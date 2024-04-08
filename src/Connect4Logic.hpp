@@ -2,12 +2,17 @@
 
 #include "Player.hpp"
 
+#include <iostream>
+
+using namespace std;
+
 #define COLS 7
 #define ROWS 6
 
 struct PlayState {
 	bool someoneWon = false;
 	bool success = false;
+	int whoWon = -1;
 };
 
 
@@ -28,6 +33,106 @@ private:
 	void DeterminePlayerPosition() {
 		isPlayer1Turn = GetRandomValue(0, 10) % 1;
 	}
+
+    /// <summary>
+    /// it's missing if a player has played in a middle position so we need to check in both directions at once
+    /// </summary>
+    /// <param name="inputVec"></param>
+    /// <param name="currentPlayer"></param>
+    /// <returns></returns>
+    int CheckIfSomeoneWon(Vector2 inputVec, int currentPlayer) {
+		Vector2 matrixBoundary = { COLS-1, ROWS-1 };
+		int counter = 0;
+
+		// left line
+		for (int i = inputVec.x; i >= 0; --i) {
+			if (matrix[(int)inputVec.y][i] == currentPlayer) {
+				++counter;
+			}
+			else {
+				break;
+			}
+		}
+
+		if (counter == 4) {
+			cout << "Player " << currentPlayer << " with left line" << endl;
+			return currentPlayer;
+		}
+		else {
+			counter = 0;
+		}
+
+		for (int i = inputVec.x; i < COLS; ++i) {
+			if (matrix[(int)inputVec.y][i] == currentPlayer) {
+				++counter;
+			}
+			else {
+				break;
+			}
+		}
+
+		if (counter == 4) {
+			cout << "Player " << currentPlayer << " with right line" << endl;
+			return currentPlayer;
+		}
+		else {
+			counter = 0;
+		}
+
+		for (int i = inputVec.y; i < ROWS; ++i) {
+			if (matrix[i][(int)inputVec.x] == currentPlayer) {
+				++counter;
+			}
+			else {
+				break;
+			}
+		}
+
+		if (counter == 4) {
+			cout << "Player " << currentPlayer << " with up" << endl;
+			return currentPlayer;
+		}
+		else {
+			counter = 0;
+		}
+
+		for (int i = inputVec.x, j = inputVec.y; i < COLS && j < ROWS; ++i, ++j) {
+			if (matrix[j][i] == currentPlayer) {
+				++counter;
+			}
+			else {
+				break;
+			}
+		}
+
+		if (counter == 4) {
+			cout << "Player " << currentPlayer << " with left diagnaol" << endl;
+			return currentPlayer;
+		}
+		else {
+			counter = 0;
+		}
+
+		for (int i = inputVec.x, j = inputVec.y; i >= 0 && j < ROWS; --i, ++j) {
+			if (matrix[j][i] == currentPlayer) {
+				++counter;
+			}
+			else {
+				break;
+			}
+		}
+
+		if (counter == 4) {
+			cout << "Player " << currentPlayer << " with right diagnaol" << endl;
+			return currentPlayer;
+		}
+		else {
+			counter = 0;
+		}
+
+        return -1;
+    }
+
 
 public:
 	Connect4Logic() {
@@ -64,14 +169,18 @@ public:
 
 	PlayState Play(Vector2 inputVec) {
 		if (matrix[(int)inputVec.y][(int)inputVec.x] != 0) {
-			return { false, false };
+			return { false, false, -1 };
 		}
 
 		matrix[(int)inputVec.y][(int)inputVec.x] = IsPlayer1Turn() ? 1 : 2;
 
-		// TODO: check if someone won or not
+        int wonPlayer;
+        if ((wonPlayer = CheckIfSomeoneWon(inputVec, IsPlayer1Turn() ? 1 : 2)) != -1) {
+            cout << "Player " << wonPlayer << " won" << endl;
+            return { true, true, wonPlayer };
+        }
 
-		return { false, true };
+		return { false, true, -1 };
 	}
 };
 

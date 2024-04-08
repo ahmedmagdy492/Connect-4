@@ -2,8 +2,8 @@
 
 #include "GameScene.hpp"
 
-const int screenWidth = 800;
-const int screenHeight = 600;
+const int screenWidth = 1600;
+const int screenHeight = 900;
 
 const int rows = 6;
 const int cols = 7;
