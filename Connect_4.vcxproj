@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="src\GameScene.hpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\WiningScene.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Connect4Logic.hpp" />

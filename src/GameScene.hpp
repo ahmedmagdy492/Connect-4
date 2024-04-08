@@ -26,8 +26,8 @@ private:
 	Player* players[2];
 
 	void InitValues() {
-		int squareWidth = screenWidth / cols - ((cols - 5.5) * 10);
-		int squareHeight = screenHeight / rows - ((rows - 2) * 10);
+		int squareWidth = screenWidth / cols - ((cols - 5.9) * 10);
+		int squareHeight = screenHeight / rows - ((rows - 2.3) * 10);
 
 		for (int j = 0; j < rows; ++j) {
 			for (int i = 0; i < cols; ++i) {
@@ -57,7 +57,9 @@ private:
 		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
 		Player* curPlayer = players[isPlayer1Turn];
 
-		DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { 10, 10 }, 25, 0, curPlayer->GetColor());
+		DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { 10, 10 }, 25, 0, WHITE);
+		Vector2 txtSize = MeasureTextEx(font, "Player 2", 25, 0);
+		DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
 
 		for (int i = 0; i < ROWS; ++i) {
 			for (int j = 0; j < COLS; ++j) {
