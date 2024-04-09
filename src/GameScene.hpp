@@ -13,7 +13,8 @@ using namespace std;
 enum ScreenMode {
 	PlayingScreen,
 	WiningScreen,
-	PauseScreen
+	PauseScreen,
+	ExitScreen
 };
 
 class GameScene {
@@ -35,6 +36,7 @@ private:
 	Player* players[2];
 
 	Sound sound = LoadSound("resources/sound.ogg");
+	Sound winSound = LoadSound("resources/win.wav");
 
 	void InitValues() {
 		int squareWidth = screenWidth / cols - ((cols - 5.9) * 10);
@@ -79,6 +81,22 @@ private:
 			}
 		}
 
+		const char* exitWord = "Reset Game";
+		Vector2 exitWordSize = MeasureTextEx(font, exitWord, 25, 0);
+		Vector2 exitWordPos = { pauseMenuWordPos.x - exitWordSize.x - 40, 10 };
+		DrawTextEx(font, exitWord, exitWordPos, 25, 0, WHITE);
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousePos = GetMousePosition();
+
+			if ((mousePos.x >= exitWordPos.x && mousePos.x <= (exitWordPos.x + exitWordSize.x)) && (mousePos.y >= 10 && mousePos.y <= (exitWordPos.y + exitWordSize.y))) {
+				currentScreenMode = ScreenMode::ExitScreen;
+				UnInitalize();
+				InitValues();
+				connect4Logic.ResetGameState();
+			}
+		}
+
 		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
 		Player* curPlayer = players[isPlayer1Turn];
 
@@ -112,9 +130,10 @@ private:
 					slots[(int)finalIndex.y][(int)finalIndex.x].SetColor(currentPlayer->GetColor());
 
 					if (playState.someoneWon) {
-						// TODO: move to wining scene
+						// move to wining scene
 						wonPlayer = playState.whoWon;
 						currentScreenMode = ScreenMode::WiningScreen;
+						PlaySound(winSound);
 					}
 					else {
 						connect4Logic.SwitchPlayerTurn();
@@ -174,6 +193,7 @@ public:
 	~GameScene() {
 		UnInitalize();
 		UnloadSound(sound);
+		UnloadSound(winSound);
 	}
 
 	void SetFont(Font font) {
@@ -203,7 +223,7 @@ public:
 		return finalIndex;
 	}
 
-	void Render() {
+	int Render() {
 		switch (currentScreenMode) {
 		case ScreenMode::PlayingScreen:
 			Draw();
@@ -216,6 +236,11 @@ public:
 		case ScreenMode::PauseScreen:
 			DrawPauseMenu();
 			break;
+		case ScreenMode::ExitScreen:
+			return 1;
+			break;
 		}
+
+		return 2;
 	}
 };

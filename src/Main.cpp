@@ -22,6 +22,8 @@ int main() {
 
 	Font font = LoadFont("resources/Rubik-ExtraBold.ttf");
 
+	Sound bgSound = LoadSound("resources/bg.mp3");
+
 	GameScene mainScene(screenWidth, screenHeight, cols, rows, GameMode::VsPlayer);
 	mainScene.SetFont(font);
 
@@ -34,11 +36,15 @@ int main() {
 
 		ClearBackground(BLACK);
 
+		if (!IsSoundPlaying(bgSound)) {
+			PlaySound(bgSound);
+		}
+
 		if (resCode == 0) {
 			break;
 		}
 		else if (resCode == 2) {
-			mainScene.Render();
+			resCode = mainScene.Render();
 		}
 		else if (resCode == 1) {
 			resCode = menuScene.Render();
@@ -48,6 +54,8 @@ int main() {
 	}
 
 	UnloadFont(font);
+
+	UnloadSound(bgSound);
 
 	CloseAudioDevice();
 
