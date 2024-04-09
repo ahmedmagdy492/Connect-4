@@ -64,6 +64,19 @@ private:
 
 		DrawRectangle(0, fromTopOffset, screenWidth, screenHeight, BLUE);
 
+		const char* pauseMenuWord = "Pause";
+		Vector2 pauseMenuWordSize = MeasureTextEx(font, pauseMenuWord, 25, 0);
+		Vector2 pauseMenuWordPos = { screenWidth - pauseMenuWordSize.x - 10, 10 };
+		DrawTextEx(font, pauseMenuWord, pauseMenuWordPos, 25, 0, WHITE);
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousePos = GetMousePosition();
+
+			if ((mousePos.x >= pauseMenuWordPos.x && mousePos.x <= (pauseMenuWordPos.x + pauseMenuWordSize.x)) && (mousePos.y >= 10 && mousePos.y <= (pauseMenuWordPos.y + pauseMenuWordSize.y)) ) {
+				currentScreenMode = ScreenMode::PauseScreen;
+			}
+		}
+
 		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
 		Player* curPlayer = players[isPlayer1Turn];
 
@@ -129,6 +142,21 @@ private:
 		}
 	}
 
+	void DrawPauseMenu() {
+		const char* winWord = "Click On Any Cell to Play in That Column. Click AnyWhere to Resume";
+		Vector2 winWordSize = MeasureTextEx(font, winWord, 28, 0);
+		Vector2 winWordPos = { (screenWidth - winWordSize.x) / 2, (screenHeight - winWordSize.y) / 2 };
+		DrawTextEx(font, winWord, winWordPos, 28, 0, YELLOW);
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousePos = GetMousePosition();
+
+			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= 0 && mousePos.y <= screenHeight)) {
+				currentScreenMode = ScreenMode::PlayingScreen;
+			}
+		}
+	}
+
 public:
 	GameScene(int screenWidth, int screenHeight, int cols, int rows, GameMode gameMode) : screenWidth(screenWidth), screenHeight(screenHeight), cols(cols), rows(rows), currentGameMode(gameMode) {
 
@@ -177,6 +205,7 @@ public:
 			DrawWiningScreen();
 			break;
 		case ScreenMode::PauseScreen:
+			DrawPauseMenu();
 			break;
 		}
 	}

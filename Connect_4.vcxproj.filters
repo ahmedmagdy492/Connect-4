@@ -21,7 +21,7 @@
     <ClCompile Include="src\GameScene.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\WiningScene.hpp">
+    <ClCompile Include="src\MenuScene.hpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
