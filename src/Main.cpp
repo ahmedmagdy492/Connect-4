@@ -13,6 +13,8 @@ int main() {
 
 	InitWindow(screenWidth, screenHeight, "Connect 4");
 
+	InitAudioDevice();
+
 	SetTargetFPS(60);
 
 	Font font = LoadFont("resources/Rubik-ExtraBold.ttf");
@@ -30,9 +32,12 @@ int main() {
 		EndDrawing();
 	}
 
+	UnloadFont(font);
+
+	CloseAudioDevice();
+
 	CloseWindow();
 
-	UnloadFont(font);
 
 	return 0;
 }

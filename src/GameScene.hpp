@@ -34,6 +34,8 @@ private:
 
 	Player* players[2];
 
+	Sound sound = LoadSound("resources/sound.ogg");
+
 	void InitValues() {
 		int squareWidth = screenWidth / cols - ((cols - 5.9) * 10);
 		int squareHeight = screenHeight / rows - ((rows - 2.3) * 10);
@@ -105,6 +107,7 @@ private:
 				PlayState playState = connect4Logic.Play(finalIndex);
 
 				if (playState.success) {
+					PlaySound(sound);
 					Player* currentPlayer = players[connect4Logic.IsPlayer1Turn()];
 					slots[(int)finalIndex.y][(int)finalIndex.x].SetColor(currentPlayer->GetColor());
 
@@ -165,6 +168,7 @@ public:
 
 	~GameScene() {
 		UnInitalize();
+		UnloadSound(sound);
 	}
 
 	void SetFont(Font font) {
