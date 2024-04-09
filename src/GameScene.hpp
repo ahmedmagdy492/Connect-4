@@ -22,7 +22,7 @@ private:
 
 	int screenWidth, screenHeight;
 	int cols, rows;
-	int wonPlayer;
+	int wonPlayer = -1;
 
 	ScreenMode currentScreenMode;
 
@@ -91,7 +91,7 @@ private:
 				Slot slot = slots[i][j];
 				Vector2 size = slot.GetSize();
 				Vector2 pos = slot.GetPosition();
-				DrawRectangle(pos.x, pos.y, size.x, size.y, slot.GetColor());
+				DrawRectangleRounded({ pos.x, pos.y, size.x, size.y }, 150, 10, slot.GetColor());
 			}
 		}
 	}
@@ -132,7 +132,7 @@ private:
 		const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
 		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
 		Vector2 winWordPos = { (screenWidth-winWordSize.x)/2, 80 };
-		DrawTextEx(font, winWord, winWordPos, 30, 0, YELLOW);
+		DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			Vector2 mousePos = GetMousePosition();
@@ -155,7 +155,12 @@ private:
 			Vector2 mousePos = GetMousePosition();
 
 			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= 0 && mousePos.y <= screenHeight)) {
-				currentScreenMode = ScreenMode::PlayingScreen;
+				if (wonPlayer == -1) {
+					currentScreenMode = ScreenMode::PlayingScreen;
+				}
+				else {
+					currentScreenMode = ScreenMode::WiningScreen;
+				}
 			}
 		}
 	}

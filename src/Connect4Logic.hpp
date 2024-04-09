@@ -130,6 +130,79 @@ private:
 			counter = 0;
 		}
 
+		// checking row by row whether someone won or not
+		for (int x = 0; x < ROWS; ++x) {
+			for (int i = 0; i < COLS; ++i) {
+				for (int j = i, c = 0; c < 4 && j < COLS; ++c, ++j) {
+					if (matrix[x][j] != currentPlayer) {
+						counter = 0;
+						break;
+					}
+					else {
+						++counter;
+					}
+				}
+
+				if (counter >= 4) {
+					cout << "Player " << currentPlayer << " with overall check" << endl;
+					return currentPlayer;
+				}
+				else {
+					counter = 0;
+				}
+			}
+		}
+
+		// checking left diagnols
+		for (int x = 0; x < ROWS; ++x) {
+			int b = x;
+			for (int i = 0; i < COLS; ++i) {
+				int c = 0;
+				b = x;
+				for (int j = i; c < 4 && j < COLS && b < ROWS; ++j, ++b, ++c) {
+					if (matrix[b][j] != currentPlayer) {
+						counter = 0;
+						break;
+					}
+					else {
+						++counter;
+					}
+				}
+				if (counter >= 4) {
+					cout << "Player " << currentPlayer << " with left diagnol check 2" << endl;
+					return currentPlayer;
+				}
+				else {
+					counter = 0;
+				}
+			}
+		}
+
+		// checking right diagnols
+		for (int x = 0; x < ROWS; ++x) {
+			int b = x;
+			for (int i = COLS - 1; i >= 0; --i) {
+				int c = 0;
+				b = x;
+				for (int j = i; c < 4 && j >= 0 && b < ROWS; --j, ++b, ++c) {
+					if (matrix[b][j] != currentPlayer) {
+						counter = 0;
+						break;
+					}
+					else {
+						++counter;
+					}
+				}
+				if (counter >= 4) {
+					cout << "Player " << currentPlayer << " with right diagnol check 2" << endl;
+					return currentPlayer;
+				}
+				else {
+					counter = 0;
+				}
+			}
+		}
+
         return -1;
     }
 
