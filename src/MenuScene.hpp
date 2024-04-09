@@ -24,8 +24,6 @@ public:
 	}
 
 	int Render() {
-		
-
 		Vector2 texturePos = { (screenWidth - logo.width)/2, -100};
 		DrawTexture(logo, texturePos.x, texturePos.y, WHITE);
 

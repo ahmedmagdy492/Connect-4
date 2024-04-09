@@ -14,13 +14,21 @@ int main() {
 
 	InitWindow(screenWidth, screenHeight, "Connect 4");
 
-	InitAudioDevice();
+	Font font = LoadFont("resources/Rubik-ExtraBold.ttf");
 
-	SetTargetFPS(60);
+	BeginDrawing();
+	ClearBackground(BLACK);
+	DrawRectangle(0, 0, screenWidth, screenHeight, Color{ 0, 0, 0, 180 });
+	Vector2 loading_txt_size = MeasureTextEx(font, "Ahmed Magdy", 40, 0);
+	DrawTextEx(font, "Ahmed Magdy", { (screenWidth - loading_txt_size.x) / 2, (screenHeight - loading_txt_size.y) / 2 }, 40, 0, WHITE);
+	EndDrawing();
 
 	SetExitKey(0);
 
-	Font font = LoadFont("resources/Rubik-ExtraBold.ttf");
+
+	InitAudioDevice();
+
+	SetTargetFPS(60);
 
 	Sound bgSound = LoadSound("resources/bg.mp3");
 
