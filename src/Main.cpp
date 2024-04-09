@@ -34,7 +34,7 @@ int main() {
 
 		ClearBackground(BLACK);
 
-		if (!resCode) {
+		if (resCode == 0) {
 			break;
 		}
 		else if (resCode == 2) {

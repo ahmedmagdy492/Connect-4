@@ -21,10 +21,6 @@ public:
 	}
 
 	int Render() {
-		/*const char* logo = "Connect 4";
-		Vector2 textureSize = MeasureTextEx(font, logo, 50, 0);
-		Vector2 texturePos = { (screenWidth - textureSize.x) / 2, 100 };
-		DrawTextEx(font, logo, texturePos, 50, 0, WHITE);*/
 		Vector2 texturePos = { (screenWidth - logo.width)/2, -100};
 		DrawTexture(logo, texturePos.x, texturePos.y, WHITE);
 
@@ -38,8 +34,8 @@ public:
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			Vector2 mousePos = GetMousePosition();
 
-			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= 0 && mousePos.y <= screenHeight)) {
-				
+			if ((mousePos.x <= (winWordPos.x + winWordSize.x) && mousePos.x >= winWordPos.x) && (mousePos.y >= winWordPos.y && mousePos.y <= (winWordPos.y + winWordSize.y))) {
+				return 2;
 			}
 		}
 
@@ -51,8 +47,8 @@ public:
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			Vector2 mousePos = GetMousePosition();
 
-			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= 0 && mousePos.y <= screenHeight)) {
-				return 2;
+			if ((mousePos.x <= (winWord2Pos.x + winWord2Size.x) && mousePos.x >= winWord2Pos.x) && (mousePos.y >= winWord2Pos.y && mousePos.y <= (winWord2Pos.y + winWord2Size.y))) {
+				return 3;
 			}
 		}
 
@@ -64,7 +60,7 @@ public:
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			Vector2 mousePos = GetMousePosition();
 
-			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= 0 && mousePos.y <= screenHeight)) {
+			if ((mousePos.x <= (winWord3Pos.x + winWord3Size.x) && mousePos.x >= winWord3Pos.x) && (mousePos.y >= winWord3Pos.y && mousePos.y <= (winWord3Pos.y + winWord3Size.y))) {
 				return 0;
 			}
 		}
