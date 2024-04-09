@@ -10,12 +10,21 @@
 
 using namespace std;
 
+enum ScreenMode {
+	PlayingScreen,
+	WiningScreen,
+	PauseScreen
+};
+
 class GameScene {
 private:
 	const int fromTopOffset = 150;
 
 	int screenWidth, screenHeight;
 	int cols, rows;
+	int wonPlayer;
+
+	ScreenMode currentScreenMode;
 
 	GameMode currentGameMode;
 	Slot slots[ROWS][COLS];
@@ -42,6 +51,7 @@ private:
 		players[0] = new Player(RED, 1);
 		players[1] = new Player(YELLOW, 2);
 
+		currentScreenMode = ScreenMode::PlayingScreen;
 	}
 
 	void UnInitalize() {
@@ -87,6 +97,8 @@ private:
 
 					if (playState.someoneWon) {
 						// TODO: move to wining scene
+						wonPlayer = playState.whoWon;
+						currentScreenMode = ScreenMode::WiningScreen;
 					}
 					else {
 						connect4Logic.SwitchPlayerTurn();
@@ -96,6 +108,23 @@ private:
 						}
 					}
 				}
+			}
+		}
+	}
+
+	void DrawWiningScreen() {
+		const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
+		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
+		Vector2 winWordPos = { (screenWidth-winWordSize.x)/2, 80 };
+		DrawTextEx(font, winWord, winWordPos, 30, 0, YELLOW);
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousePos = GetMousePosition();
+
+			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= winWordPos.y && mousePos.y < (winWordPos.y + winWordSize.y))) {
+				UnInitalize();
+				InitValues();
+				connect4Logic.ResetGameState();
 			}
 		}
 	}
@@ -138,7 +167,17 @@ public:
 	}
 
 	void Render() {
-		Draw();
-		HandleUserInput();
+		switch (currentScreenMode) {
+		case ScreenMode::PlayingScreen:
+			Draw();
+			HandleUserInput();
+			break;
+		case ScreenMode::WiningScreen:
+			Draw();
+			DrawWiningScreen();
+			break;
+		case ScreenMode::PauseScreen:
+			break;
+		}
 	}
 };
