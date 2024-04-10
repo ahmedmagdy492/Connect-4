@@ -57,6 +57,10 @@ int main() {
 		else if (resCode == 1) {
 			resCode = menuScene.Render();
 		}
+		else if (resCode == 3) {
+			mainScene.SetGameMode(GameMode::VsComputer);
+			resCode = mainScene.Render();
+		}
 
 		EndDrawing();
 	}

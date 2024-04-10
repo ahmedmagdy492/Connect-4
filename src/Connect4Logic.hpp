@@ -225,6 +225,32 @@ public:
 		isPlayer1Turn = !isPlayer1Turn;
 	}
 
+	void GetAllPossiblePlayablePositions(Vector2 array[COLS], int *len) {
+		int counter = 0;
+
+		for (int c = 0; c < COLS; ++c) {
+			for (int r = 0; r < ROWS; ++r) {
+				if (matrix[r][c] == 0) {
+					if (r == 0) {
+						array[counter].x = c;
+						array[counter].y = r;
+						++counter;
+					}
+					else {
+						if (array[counter-1].x == c) {
+							--counter;
+							array[counter].x = c;
+							array[counter].y = r;
+							++counter;
+						}
+					}
+				}
+			}
+		}
+
+		*len = counter;
+	}
+
 	Vector2 GetLowestIndexInCol(Vector2 inputVec) {
 		Vector2 matrixVec = { COLS, ROWS-1 };
 		int underneethSlotsCount = matrixVec.y - inputVec.y;

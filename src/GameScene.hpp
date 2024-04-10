@@ -129,6 +129,14 @@ private:
 					Player* currentPlayer = players[connect4Logic.IsPlayer1Turn()];
 					slots[(int)finalIndex.y][(int)finalIndex.x].SetColor(currentPlayer->GetColor());
 
+					Vector2 array[COLS] = { 0 };
+					int len = 0;
+					connect4Logic.GetAllPossiblePlayablePositions(array, &len);
+					
+					for (int i = 0; i < len; ++i) {
+						cout << "(" << array[i].x << ", " << array[i].y << ")" << endl;
+					}
+
 					if (playState.someoneWon) {
 						// move to wining scene
 						wonPlayer = playState.whoWon;
@@ -140,6 +148,12 @@ private:
 
 						if (currentGameMode == GameMode::VsComputer && !connect4Logic.IsPlayer1Turn()) {
 							// TODO: implement computer game play here
+							// 1.get all possible playable positions
+							// 2.clone the current state of the matrix
+							// 3.try to play in each position invidually
+							// 4.up until someone and return a positive number if computer won
+							// negative if will lose and 0 if draw
+							// 5.finally play in any positive position
 						}
 					}
 				}
@@ -194,6 +208,10 @@ public:
 		UnInitalize();
 		UnloadSound(sound);
 		UnloadSound(winSound);
+	}
+
+	void SetGameMode(GameMode gameMode) {
+		currentGameMode = gameMode;
 	}
 
 	void SetFont(Font font) {
