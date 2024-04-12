@@ -14,7 +14,8 @@ enum ScreenMode {
 	PlayingScreen,
 	WiningScreen,
 	PauseScreen,
-	ExitScreen
+	ExitScreen,
+	DrawScreen
 };
 
 class GameScene {
@@ -119,7 +120,6 @@ private:
 			Vector2 clickedObjectIndex = GetClickedSlotIndex();
 
 			if (clickedObjectIndex.x != -1 && clickedObjectIndex.y != -1) {
-				//Vector2 mappedIndex = MapMousePosToMatrixIndex(clickedObjectIndex);
 				Vector2 finalIndex = connect4Logic.GetLowestIndexInCol(clickedObjectIndex);
 
 				PlayState playState = connect4Logic.Play(finalIndex);
@@ -129,31 +129,35 @@ private:
 					Player* currentPlayer = players[connect4Logic.IsPlayer1Turn()];
 					slots[(int)finalIndex.y][(int)finalIndex.x].SetColor(currentPlayer->GetColor());
 
-					Vector2 array[COLS] = { 0 };
-					int len = 0;
-					connect4Logic.GetAllPossiblePlayablePositions(array, &len);
-					
-					for (int i = 0; i < len; ++i) {
-						cout << "(" << array[i].x << ", " << array[i].y << ")" << endl;
-					}
-
 					if (playState.someoneWon) {
 						// move to wining scene
 						wonPlayer = playState.whoWon;
 						currentScreenMode = ScreenMode::WiningScreen;
 						PlaySound(winSound);
 					}
+					else if (playState.isItADraw) {
+						currentScreenMode = ScreenMode::DrawScreen;
+					}
 					else {
 						connect4Logic.SwitchPlayerTurn();
 
-						if (currentGameMode == GameMode::VsComputer && !connect4Logic.IsPlayer1Turn()) {
-							// TODO: implement computer game play here
-							// 1.get all possible playable positions
-							// 2.clone the current state of the matrix
-							// 3.try to play in each position invidually
-							// 4.up until someone and return a positive number if computer won
-							// negative if will lose and 0 if draw
-							// 5.finally play in any positive position
+						if (currentGameMode == GameMode::VsComputer) {
+							Vector2 bestPosition = connect4Logic.ComputerPlay();
+							playState = connect4Logic.Play(bestPosition);
+
+							if (playState.success) {
+								PlaySound(sound);
+								Player* currentPlayer = players[connect4Logic.IsPlayer1Turn()];
+								slots[(int)bestPosition.y][(int)bestPosition.x].SetColor(currentPlayer->GetColor());
+
+								if (playState.someoneWon) {
+									// move to wining scene
+									wonPlayer = playState.whoWon;
+									currentScreenMode = ScreenMode::WiningScreen;
+									PlaySound(winSound);
+								}
+								connect4Logic.SwitchPlayerTurn();
+							}
 						}
 					}
 				}
@@ -165,6 +169,23 @@ private:
 		const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
 		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
 		Vector2 winWordPos = { (screenWidth-winWordSize.x)/2, 80 };
+		DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
+
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			Vector2 mousePos = GetMousePosition();
+
+			if ((mousePos.x <= screenWidth && mousePos.x > 0) && (mousePos.y >= winWordPos.y && mousePos.y < (winWordPos.y + winWordSize.y))) {
+				UnInitalize();
+				InitValues();
+				connect4Logic.ResetGameState();
+			}
+		}
+	}
+
+	void DrawDrawScreen() {
+		const char* winWord = "Draw No One Won, Click Here To Retry";
+		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
+		Vector2 winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
 		DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -256,6 +277,10 @@ public:
 			break;
 		case ScreenMode::ExitScreen:
 			return 1;
+			break;
+		case ScreenMode::DrawScreen:
+			Draw();
+			DrawDrawScreen();
 			break;
 		}
 

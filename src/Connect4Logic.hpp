@@ -13,12 +13,13 @@ struct PlayState {
 	bool someoneWon = false;
 	bool success = false;
 	int whoWon = -1;
+	bool isItADraw = false;
 };
 
 
 class Connect4Logic {
 private:
-	bool isPlayer1Turn = true;
+	unsigned char currentPlayer; // will have either the value 1 or 2
 
 	int matrix[ROWS][COLS];
 
@@ -30,8 +31,8 @@ private:
 		}
 	}
 
-	void DeterminePlayerPosition() {
-		isPlayer1Turn = GetRandomValue(0, 10) % 1;
+	void DeterminePlayerTurn() {
+		currentPlayer = 1;
 	}
 
     /// <summary>
@@ -203,9 +204,24 @@ private:
 			}
 		}
 
+		if (IsItADraw()) {
+			// a draw
+			return -2;
+		}
+
         return -1;
     }
 
+	bool IsItADraw() {
+		for (int i = 0; i < ROWS; ++i) {
+			for (int j = 0; j < COLS; ++j) {
+				if (matrix[i][j] == 0)
+					return false;
+			}
+		}
+
+		return true;
+	}
 
 public:
 	Connect4Logic() {
@@ -214,23 +230,28 @@ public:
 
 	void ResetGameState() {
 		InitMatrix();
-		DeterminePlayerPosition();
+		DeterminePlayerTurn();
 	}
 
 	bool IsPlayer1Turn() {
-		return isPlayer1Turn;
+		return currentPlayer == 1;
 	}
 
 	void SwitchPlayerTurn() {
-		isPlayer1Turn = !isPlayer1Turn;
+		if (currentPlayer == 1) {
+			currentPlayer = 2;
+		}
+		else {
+			currentPlayer = 1;
+		}
 	}
 
-	void GetAllPossiblePlayablePositions(Vector2 array[COLS], int *len) {
+	void GetAllPossiblePlayablePositions(int inputMatrix[ROWS][COLS], Vector2 array[COLS], int *len) {
 		int counter = 0;
 
 		for (int c = 0; c < COLS; ++c) {
 			for (int r = 0; r < ROWS; ++r) {
-				if (matrix[r][c] == 0) {
+				if (inputMatrix[r][c] == 0) {
 					if (r == 0) {
 						array[counter].x = c;
 						array[counter].y = r;
@@ -251,6 +272,68 @@ public:
 		*len = counter;
 	}
 
+	Vector2 ComputerPlay() {
+		int prevMatrixState[ROWS][COLS];
+
+		// cloning the current matrix state
+		for (int i = 0; i < ROWS; ++i) {
+			for (int j = 0; j < COLS; ++j) {
+				prevMatrixState[i][j] = matrix[i][j];
+			}
+		}
+
+		Vector2 currentPossiblePositions[COLS] = { 0 };
+		int len = 0;
+		GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
+		Vector2 lastTestedPosition = { 0 };
+
+		for (int i = 0; i < len; ++i) {
+			lastTestedPosition = currentPossiblePositions[i];
+			int result = SimulateGamePlay(lastTestedPosition, currentPlayer);
+			if (result == 1) {
+				return lastTestedPosition;
+			}
+		}
+
+		// restoring the previous matrix state
+		for (int i = 0; i < ROWS; ++i) {
+			for (int j = 0; j < COLS; ++j) {
+				matrix[i][j] = prevMatrixState[i][j];
+			}
+		}
+
+		return lastTestedPosition;
+	}
+
+	int SimulateGamePlay(Vector2 currentPossiblePlayablePosition, unsigned char currentPlayerTurn) {
+		PlayState playState = Play(currentPossiblePlayablePosition);
+
+		if (playState.success) {
+			if (playState.someoneWon) {
+				return 1;
+			}
+			else {
+				SwitchPlayerTurn();
+				Vector2 currentPossiblePositions[COLS] = { 0 };
+				int len = 0;
+				GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
+				Vector2 lastTestedPosition = { 0 };
+
+				for (int i = 0; i < len; ++i) {
+					lastTestedPosition = currentPossiblePositions[i];
+					int result = SimulateGamePlay(lastTestedPosition, currentPlayerTurn);
+					if (result == 1 && currentPlayerTurn == 2) {
+						return 1;
+					}
+					else if (result == 1 && currentPlayerTurn == 1) {
+						return -1;
+					}
+				}
+			}
+		}
+		return -1;
+	}
+
 	Vector2 GetLowestIndexInCol(Vector2 inputVec) {
 		Vector2 matrixVec = { COLS, ROWS-1 };
 		int underneethSlotsCount = matrixVec.y - inputVec.y;
@@ -268,18 +351,22 @@ public:
 
 	PlayState Play(Vector2 inputVec) {
 		if (matrix[(int)inputVec.y][(int)inputVec.x] != 0) {
-			return { false, false, -1 };
+			return { false, false, -1, false };
 		}
 
 		matrix[(int)inputVec.y][(int)inputVec.x] = IsPlayer1Turn() ? 1 : 2;
 
         int wonPlayer;
-        if ((wonPlayer = CheckIfSomeoneWon(inputVec, IsPlayer1Turn() ? 1 : 2)) != -1) {
+        if ((wonPlayer = CheckIfSomeoneWon(inputVec, IsPlayer1Turn() ? 1 : 2)) != -1 && wonPlayer != -2) {
             cout << "Player " << wonPlayer << " won" << endl;
-            return { true, true, wonPlayer };
+            return { true, true, wonPlayer, false };
         }
 
-		return { false, true, -1 };
+		if (wonPlayer == -2) {
+			return { false, true, -1, true };
+		}
+
+		return { false, true, -1, false };
 	}
 };
 
