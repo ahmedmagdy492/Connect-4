@@ -272,8 +272,9 @@ public:
 		*len = counter;
 	}
 
-	Vector2 ComputerPlay() {
+	Vector2 GetBestPosition() {
 		int prevMatrixState[ROWS][COLS];
+		unsigned char prevPlayerTurn = currentPlayer;
 
 		// cloning the current matrix state
 		for (int i = 0; i < ROWS; ++i) {
@@ -291,7 +292,7 @@ public:
 			lastTestedPosition = currentPossiblePositions[i];
 			int result = SimulateGamePlay(lastTestedPosition, currentPlayer);
 			if (result == 1) {
-				return lastTestedPosition;
+				break;
 			}
 		}
 
@@ -301,6 +302,8 @@ public:
 				matrix[i][j] = prevMatrixState[i][j];
 			}
 		}
+
+		currentPlayer = prevPlayerTurn;
 
 		return lastTestedPosition;
 	}

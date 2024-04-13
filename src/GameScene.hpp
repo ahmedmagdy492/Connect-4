@@ -100,10 +100,16 @@ private:
 
 		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
 		Player* curPlayer = players[isPlayer1Turn];
-
-		DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { 10, 10 }, 25, 0, WHITE);
-		Vector2 txtSize = MeasureTextEx(font, "Player 2", 25, 0);
-		DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
+		if (currentGameMode == GameMode::VsComputer) {
+			DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Computer", { 10, 10 }, 25, 0, WHITE);
+			Vector2 txtSize = MeasureTextEx(font, "Computer", 25, 0);
+			DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
+		}
+		else {
+			DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { 10, 10 }, 25, 0, WHITE);
+			Vector2 txtSize = MeasureTextEx(font, "Player 2", 25, 0);
+			DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
+		}
 
 		for (int i = 0; i < ROWS; ++i) {
 			for (int j = 0; j < COLS; ++j) {
@@ -142,7 +148,7 @@ private:
 						connect4Logic.SwitchPlayerTurn();
 
 						if (currentGameMode == GameMode::VsComputer) {
-							Vector2 bestPosition = connect4Logic.ComputerPlay();
+							Vector2 bestPosition = connect4Logic.GetBestPosition();
 							playState = connect4Logic.Play(bestPosition);
 
 							if (playState.success) {
@@ -166,10 +172,21 @@ private:
 	}
 
 	void DrawWiningScreen() {
-		const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
-		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
-		Vector2 winWordPos = { (screenWidth-winWordSize.x)/2, 80 };
-		DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
+		Vector2 winWordSize;
+		Vector2 winWordPos;
+
+		if (currentGameMode == GameMode::VsPlayer) {
+			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
+			winWordSize = MeasureTextEx(font, winWord, 30, 0);
+			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
+			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
+		}
+		else {
+			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Computer Won Click Here To Retry";
+			winWordSize = MeasureTextEx(font, winWord, 30, 0);
+			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
+			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
+		}
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 			Vector2 mousePos = GetMousePosition();
