@@ -1,14 +1,9 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-
 #include <raylib.h>
 #include "Slot.hpp"
 #include "GameMode.hpp"
 #include "Connect4Logic.hpp"
-
-using namespace std;
 
 enum ScreenMode {
 	PlayingScreen,
@@ -45,8 +40,8 @@ private:
 
 		for (int j = 0; j < rows; ++j) {
 			for (int i = 0; i < cols; ++i) {
-				Vector2 size = { squareWidth, squareHeight };
-				Vector2 position = { 10 * (i + 1) + i * squareWidth, fromTopOffset + 10 * (j + 1) + j * squareHeight };
+			  Vector2 size = { (float)squareWidth, (float)squareHeight };
+			  Vector2 position = { (float)10 * (i + 1) + i * squareWidth, (float)fromTopOffset + 10 * (j + 1) + j * squareHeight };
 				Slot slot(BLACK, size, position);
 				slots[j][i] = slot;
 			}
@@ -71,7 +66,7 @@ private:
 
 		const char* pauseMenuWord = "Pause";
 		Vector2 pauseMenuWordSize = MeasureTextEx(font, pauseMenuWord, 25, 0);
-		Vector2 pauseMenuWordPos = { screenWidth - pauseMenuWordSize.x - 10, 10 };
+		Vector2 pauseMenuWordPos = { (float)screenWidth - pauseMenuWordSize.x - 10, (float)10 };
 		DrawTextEx(font, pauseMenuWord, pauseMenuWordPos, 25, 0, WHITE);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -84,7 +79,7 @@ private:
 
 		const char* exitWord = "Reset Game";
 		Vector2 exitWordSize = MeasureTextEx(font, exitWord, 25, 0);
-		Vector2 exitWordPos = { pauseMenuWordPos.x - exitWordSize.x - 40, 10 };
+		Vector2 exitWordPos = { (float)pauseMenuWordPos.x - exitWordSize.x - 40, (float)10 };
 		DrawTextEx(font, exitWord, exitWordPos, 25, 0, WHITE);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -101,12 +96,12 @@ private:
 		bool isPlayer1Turn = connect4Logic.IsPlayer1Turn();
 		Player* curPlayer = players[isPlayer1Turn];
 		if (currentGameMode == GameMode::VsComputer) {
-			DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Computer", { 10, 10 }, 25, 0, WHITE);
+		  DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Computer", { (float)10, (float)10 }, 25, 0, WHITE);
 			Vector2 txtSize = MeasureTextEx(font, "Computer", 25, 0);
 			DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
 		}
 		else {
-			DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { 10, 10 }, 25, 0, WHITE);
+		  DrawTextEx(font, isPlayer1Turn ? "Player 1" : "Player 2", { (float)10, (float)10 }, 25, 0, WHITE);
 			Vector2 txtSize = MeasureTextEx(font, "Player 2", 25, 0);
 			DrawRectangle(txtSize.x + 20, 12, 30, 20, curPlayer->GetColor());
 		}
@@ -178,13 +173,13 @@ private:
 		if (currentGameMode == GameMode::VsPlayer) {
 			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
 			winWordSize = MeasureTextEx(font, winWord, 30, 0);
-			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
+			winWordPos = { (float)(screenWidth - winWordSize.x) / 2, (float)80 };
 			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 		}
 		else {
 			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Computer Won Click Here To Retry";
 			winWordSize = MeasureTextEx(font, winWord, 30, 0);
-			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
+			winWordPos = { (float)(screenWidth - winWordSize.x) / 2, (float)80 };
 			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 		}
 
@@ -202,7 +197,7 @@ private:
 	void DrawDrawScreen() {
 		const char* winWord = "Draw No One Won, Click Here To Retry";
 		Vector2 winWordSize = MeasureTextEx(font, winWord, 30, 0);
-		Vector2 winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
+		Vector2 winWordPos = { (float)(screenWidth - winWordSize.x) / 2, (float)80 };
 		DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
@@ -219,7 +214,7 @@ private:
 	void DrawPauseMenu() {
 		const char* winWord = "Click On Any Cell to Play in That Column. Click AnyWhere to Resume";
 		Vector2 winWordSize = MeasureTextEx(font, winWord, 28, 0);
-		Vector2 winWordPos = { (screenWidth - winWordSize.x) / 2, (screenHeight - winWordSize.y) / 2 };
+		Vector2 winWordPos = { (float)(screenWidth - winWordSize.x) / 2, (float)(screenHeight - winWordSize.y) / 2 };
 		DrawTextEx(font, winWord, winWordPos, 28, 0, YELLOW);
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {

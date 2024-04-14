@@ -2,10 +2,6 @@
 
 #include "Player.hpp"
 
-#include <iostream>
-
-using namespace std;
-
 #define COLS 7
 #define ROWS 6
 
@@ -42,7 +38,7 @@ private:
     /// <param name="currentPlayer"></param>
     /// <returns></returns>
     int CheckIfSomeoneWon(Vector2 inputVec, int currentPlayer) {
-		Vector2 matrixBoundary = { COLS-1, ROWS-1 };
+      Vector2 matrixBoundary = { (float)COLS-1, (float)ROWS-1 };
 		int counter = 0;
 
 		// left line
@@ -56,7 +52,6 @@ private:
 		}
 
 		if (counter == 4) {
-			cout << "Player " << currentPlayer << " with left line" << endl;
 			return currentPlayer;
 		}
 		else {
@@ -73,7 +68,6 @@ private:
 		}
 
 		if (counter == 4) {
-			cout << "Player " << currentPlayer << " with right line" << endl;
 			return currentPlayer;
 		}
 		else {
@@ -90,7 +84,6 @@ private:
 		}
 
 		if (counter == 4) {
-			cout << "Player " << currentPlayer << " with up" << endl;
 			return currentPlayer;
 		}
 		else {
@@ -107,7 +100,6 @@ private:
 		}
 
 		if (counter == 4) {
-			cout << "Player " << currentPlayer << " with left diagnaol" << endl;
 			return currentPlayer;
 		}
 		else {
@@ -124,7 +116,6 @@ private:
 		}
 
 		if (counter == 4) {
-			cout << "Player " << currentPlayer << " with right diagnaol" << endl;
 			return currentPlayer;
 		}
 		else {
@@ -145,7 +136,6 @@ private:
 				}
 
 				if (counter >= 4) {
-					cout << "Player " << currentPlayer << " with overall check" << endl;
 					return currentPlayer;
 				}
 				else {
@@ -170,7 +160,6 @@ private:
 					}
 				}
 				if (counter >= 4) {
-					cout << "Player " << currentPlayer << " with left diagnol check 2" << endl;
 					return currentPlayer;
 				}
 				else {
@@ -195,7 +184,6 @@ private:
 					}
 				}
 				if (counter >= 4) {
-					cout << "Player " << currentPlayer << " with right diagnol check 2" << endl;
 					return currentPlayer;
 				}
 				else {
@@ -361,7 +349,6 @@ public:
 
         int wonPlayer;
         if ((wonPlayer = CheckIfSomeoneWon(inputVec, IsPlayer1Turn() ? 1 : 2)) != -1 && wonPlayer != -2) {
-            cout << "Player " << wonPlayer << " won" << endl;
             return { true, true, wonPlayer, false };
         }
 

@@ -20,7 +20,7 @@ int main() {
 	ClearBackground(BLACK);
 	DrawRectangle(0, 0, screenWidth, screenHeight, Color{ 0, 0, 0, 180 });
 	Vector2 loading_txt_size = MeasureTextEx(font, "Ahmed Magdy", 40, 0);
-	DrawTextEx(font, "Ahmed Magdy", { (screenWidth - loading_txt_size.x) / 2, (screenHeight - loading_txt_size.y) / 2 }, 40, 0, WHITE);
+	DrawTextEx(font, "Ahmed Magdy", { (float)(screenWidth - loading_txt_size.x) / 2, (float)(screenHeight - loading_txt_size.y) / 2 }, 40, 0, WHITE);
 	EndDrawing();
 
 	SetExitKey(0);
