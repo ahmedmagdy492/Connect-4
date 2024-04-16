@@ -20,6 +20,7 @@ struct PlayState {
 class Connect4Logic {
 private:
 	unsigned char currentPlayer; // will have either the value 1 or 2
+	Vector2 winingPositions[COLS];
 
 	int matrix[ROWS][COLS];
 
@@ -48,6 +49,7 @@ private:
 		// left line
 		for (int i = inputVec.x; i >= 0; --i) {
 			if (matrix[(int)inputVec.y][i] == currentPlayer) {
+				winingPositions[counter] = { (float)i, inputVec.y };
 				++counter;
 			}
 			else {
@@ -65,6 +67,7 @@ private:
 
 		for (int i = inputVec.x; i < COLS; ++i) {
 			if (matrix[(int)inputVec.y][i] == currentPlayer) {
+				winingPositions[counter] = { (float)i, inputVec.y };
 				++counter;
 			}
 			else {
@@ -82,6 +85,7 @@ private:
 
 		for (int i = inputVec.y; i < ROWS; ++i) {
 			if (matrix[i][(int)inputVec.x] == currentPlayer) {
+				winingPositions[counter] = { inputVec.x, (float)i };
 				++counter;
 			}
 			else {
@@ -99,6 +103,7 @@ private:
 
 		for (int i = inputVec.x, j = inputVec.y; i < COLS && j < ROWS; ++i, ++j) {
 			if (matrix[j][i] == currentPlayer) {
+				winingPositions[counter] = { (float)i, (float)j };
 				++counter;
 			}
 			else {
@@ -116,6 +121,7 @@ private:
 
 		for (int i = inputVec.x, j = inputVec.y; i >= 0 && j < ROWS; --i, ++j) {
 			if (matrix[j][i] == currentPlayer) {
+				winingPositions[counter] = {(float)i, (float)j};
 				++counter;
 			}
 			else {
@@ -140,6 +146,7 @@ private:
 						break;
 					}
 					else {
+						winingPositions[counter] = { (float)j, (float)x};
 						++counter;
 					}
 				}
@@ -166,6 +173,7 @@ private:
 						break;
 					}
 					else {
+						winingPositions[counter] = { (float)j, (float)b };
 						++counter;
 					}
 				}
@@ -191,6 +199,7 @@ private:
 						break;
 					}
 					else {
+						winingPositions[counter] = { (float)j, (float)b };
 						++counter;
 					}
 				}
@@ -272,6 +281,10 @@ public:
 		*len = counter;
 	}
 
+	Vector2* GetWiningPositions() {
+		return winingPositions;
+	}
+
 	Vector2 GetBestPosition() {
 		int prevMatrixState[ROWS][COLS];
 		unsigned char prevPlayerTurn = currentPlayer;
@@ -286,13 +299,19 @@ public:
 		Vector2 currentPossiblePositions[COLS] = { 0 };
 		int len = 0;
 		GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
-		Vector2 lastTestedPosition = { 0 };
+		Vector2 bestPosition = { 0 };
+		int bestMove = INT_MIN;
 
 		for (int i = 0; i < len; ++i) {
-			lastTestedPosition = currentPossiblePositions[i];
-			int result = SimulateGamePlay(lastTestedPosition, currentPlayer);
-			if (result == 1) {
-				break;
+			PlayState playState = Play(currentPossiblePositions[i], currentPlayer);
+			if (playState.success) {
+				currentPlayer = prevPlayerTurn;
+				int currentMove = SimulateGamePlay(currentPossiblePositions[i], 2);
+				UnPlay(currentPossiblePositions[i]);
+				if (currentMove > bestMove) {
+					bestMove = currentMove;
+					bestPosition = currentPossiblePositions[i];
+				}
 			}
 		}
 
@@ -305,36 +324,81 @@ public:
 
 		currentPlayer = prevPlayerTurn;
 
-		return lastTestedPosition;
+		return bestPosition;
 	}
 
-	int SimulateGamePlay(Vector2 currentPossiblePlayablePosition, unsigned char currentPlayerTurn) {
-		PlayState playState = Play(currentPossiblePlayablePosition);
+	int SimulateGamePlay(Vector2 currentPossiblePlayablePosition, unsigned char currentPlayer) {
+		switch(this->CheckIfSomeoneWon(currentPossiblePlayablePosition, currentPlayer)) {
+		case 2:
+			return 1;
+		case 1:
+			return -1;
+		case -2:
+			return 0;
+		}
 
-		if (playState.success) {
-			if (playState.someoneWon) {
-				return 1;
-			}
-			else {
-				SwitchPlayerTurn();
-				Vector2 currentPossiblePositions[COLS] = { 0 };
-				int len = 0;
-				GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
-				Vector2 lastTestedPosition = { 0 };
+		if (currentPlayer == 1) {
+			Vector2 currentPossiblePositions[COLS] = { 0 };
+			int len = 0;
+			GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
+			Vector2 bestPosition = { 0 };
+			int bestMove = INT_MIN;
 
-				for (int i = 0; i < len; ++i) {
-					lastTestedPosition = currentPossiblePositions[i];
-					int result = SimulateGamePlay(lastTestedPosition, currentPlayerTurn);
-					if (result == 1 && currentPlayerTurn == 2) {
-						return 1;
+			for (int i = 0; i < len; ++i) {
+				PlayState playState = Play(currentPossiblePositions[i], currentPlayer);
+				if (playState.success) {
+					if (playState.someoneWon) {
+						switch (playState.whoWon) {
+						case 1:
+							return -1;
+						case 2:
+							return 1;
+						default:
+							return 0;
+						}
 					}
-					else if (result == 1 && currentPlayerTurn == 1) {
-						return -1;
+					int currentMove = SimulateGamePlay(currentPossiblePositions[i], 2);
+					UnPlay(currentPossiblePositions[i]);
+					if (currentMove > bestMove) {
+						bestMove = currentMove;
+						bestPosition = currentPossiblePositions[i];
 					}
 				}
 			}
+
+			return bestMove;
 		}
-		return -1;
+		else {
+			Vector2 currentPossiblePositions[COLS] = { 0 };
+			int len = 0;
+			GetAllPossiblePlayablePositions(matrix, currentPossiblePositions, &len);
+			Vector2 bestPosition = { 0 };
+			int bestMove = INT_MAX;
+
+			for (int i = 0; i < len; ++i) {
+				PlayState playState = Play(currentPossiblePositions[i], currentPlayer);
+				if (playState.success) {
+					if (playState.someoneWon) {
+						switch (playState.whoWon) {
+						case 1:
+							return -1;
+						case 2:
+							return 1;
+						default:
+							return 0;
+						}
+					}
+					int currentMove = SimulateGamePlay(currentPossiblePositions[i], 1);
+					UnPlay(currentPossiblePositions[i]);
+					if (currentMove < bestMove) {
+						bestMove = currentMove;
+						bestPosition = currentPossiblePositions[i];
+					}
+				}
+			}
+
+			return bestMove;
+		}
 	}
 
 	Vector2 GetLowestIndexInCol(Vector2 inputVec) {
@@ -370,6 +434,30 @@ public:
 		}
 
 		return { false, true, -1, false };
+	}
+
+	PlayState Play(Vector2 inputVec, unsigned char player) {
+		if (matrix[(int)inputVec.y][(int)inputVec.x] != 0) {
+			return { false, false, -1, false };
+		}
+
+		matrix[(int)inputVec.y][(int)inputVec.x] = player;
+
+		int wonPlayer;
+		if ((wonPlayer = CheckIfSomeoneWon(inputVec, player)) != -1 && wonPlayer != -2) {
+			cout << "Player " << wonPlayer << " won" << endl;
+			return { true, true, wonPlayer, false };
+		}
+
+		if (wonPlayer == -2) {
+			return { false, true, -1, true };
+		}
+
+		return { false, true, -1, false };
+	}
+
+	void UnPlay(Vector2 position) {
+		matrix[(int)position.y][(int)position.x] = 0;
 	}
 };
 
