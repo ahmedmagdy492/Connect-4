@@ -184,14 +184,14 @@ private:
 			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Player2 Won Click Here To Retry";
 			winWordSize = MeasureTextEx(font, winWord, 30, 0);
 			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
-			DrawRectangle(winWordPos.x + winWordSize.x + 10, winWordPos.y, 25, 25, wonPlayer == 1 ? RED : YELLOW);
+			DrawRectangle(winWordPos.x + winWordSize.x + 10, winWordPos.y, 25, 25, wonPlayer == 2 ? RED : YELLOW);
 			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 		}
 		else {
 			const char* winWord = wonPlayer == 1 ? "Player1 Won Click Here To Retry" : "Computer Won Click Here To Retry";
 			winWordSize = MeasureTextEx(font, winWord, 30, 0);
 			winWordPos = { (screenWidth - winWordSize.x) / 2, 80 };
-			DrawRectangle(winWordPos.x + winWordSize.x + 10, winWordPos.y, 25, 25, wonPlayer == 1 ? RED : YELLOW);
+			DrawRectangle(winWordPos.x + winWordSize.x + 10, winWordPos.y, 25, 25, wonPlayer == 2 ? RED : YELLOW);
 			DrawTextEx(font, winWord, winWordPos, 30, 0, WHITE);
 		}
 
